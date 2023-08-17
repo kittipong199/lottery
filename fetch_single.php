@@ -1,45 +1,30 @@
 <?php
-
-//fetch_single.php
-
-include('db_connect.php');
-
-if(isset($_GET["id"]))
+include('db.php');
+include('function.php');
+if(isset($_POST["user_id"]))
 {
- $query = "SELECT * FROM tbl_employee WHERE id = '".$_GET["id"]."'";
-
- $statement = $connect->prepare($query);
+ $output = array();
+ $statement = $connection->prepare(
+  "SELECT * FROM users 
+  WHERE id = '".$_POST["user_id"]."' 
+  LIMIT 1"
+ );
  $statement->execute();
  $result = $statement->fetchAll();
- $output = '<div class="row">';
  foreach($result as $row)
  {
-  $images = '';
-  if($row["images"] != '')
+  $output["first_name"] = $row["first_name"];
+  $output["last_name"] = $row["last_name"];
+  if($row["image"] != '')
   {
-   $images = '<img src="images/'.$row["images"].'" class="img-responsive img-thumbnail" />';
+   $output['user_image'] = '<img src="upload/'.$row["image"].'" class="img-thumbnail" width="50" height="35" /><input type="hidden" name="hidden_user_image" value="'.$row["image"].'" />';
   }
   else
   {
-   $images = '<img src="https://www.gravatar.com/avatar/38ed5967302ec60ff4417826c24feef6?s=80&d=mm&r=g" class="img-responsive img-thumbnail" />';
+   $output['user_image'] = '<input type="hidden" name="hidden_user_image" value="" />';
   }
-  $output .= '
-  <div class="col-md-3">
-   <br />
-   '.$images.'
-  </div>
-  <div class="col-md-9">
-   <br />
-   <p><label>Name :&nbsp;</label>'.$row["name"].'</p>
-   <p><label>Address :&nbsp;</label>'.$row["address"].'</p>
-   <p><label>Gender :&nbsp;</label>'.$row["gender"].'</p>
-   <p><label>Designation :&nbsp;</label>'.$row["designation"].'</p>
-   <p><label>Age :&nbsp;</label>'.$row["age"].' years</p>
-  </div>
-  </div><br />
-  ';
  }
- echo $output;
+ echo json_encode($output);
 }
-
 ?>
+   
